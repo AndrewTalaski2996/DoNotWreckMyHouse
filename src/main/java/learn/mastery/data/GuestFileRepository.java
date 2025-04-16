@@ -43,18 +43,6 @@ public class GuestFileRepository implements GuestRepository{
                 .orElse(null);
     }
 
-    private void writeAll(List<Guest> guests) throws DataException {
-        try (PrintWriter writer = new PrintWriter(directory)) {
-            writer.println(HEADER);
-
-            for (Guest guest : guests) {
-                writer.println(serialize(guest));
-            }
-        } catch (FileNotFoundException ex) {
-            throw new DataException(ex);
-        }
-    }
-
     private String serialize(Guest guest) {
         StringBuffer buffer = new StringBuffer(100);
         buffer.append(guest.getGuest_id()).append(DELIMITER);

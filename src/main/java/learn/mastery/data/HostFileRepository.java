@@ -46,18 +46,6 @@ public class HostFileRepository implements HostRepository{
                 .orElse(null);
     }
 
-    private void writeAll(List<Host> hosts) throws DataException {
-        try (PrintWriter writer = new PrintWriter(directory)) {
-            writer.println(HEADER);
-
-            for (Host host : hosts) {
-                writer.println(serialize(host));
-            }
-        } catch (FileNotFoundException ex) {
-            throw new DataException(ex);
-        }
-    }
-
     private String serialize(Host host) {
         StringBuffer buffer = new StringBuffer(100);
         buffer.append(host.getId()).append(DELIMITER);
