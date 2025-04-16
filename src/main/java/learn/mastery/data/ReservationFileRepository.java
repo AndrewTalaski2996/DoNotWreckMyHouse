@@ -1,11 +1,15 @@
 package learn.mastery.data;
 
+import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +27,7 @@ public class ReservationFileRepository implements ReservationRepository{
 
     @Override
     public List<Reservation> findAll() throws DataException {
-        ArrayList<Reservation> result = new ArrayList<>();
+        List<Reservation> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(directory))) {
             reader.readLine(); //skip header
 
@@ -42,6 +46,27 @@ public class ReservationFileRepository implements ReservationRepository{
                 .filter(r -> r.getId() == id)
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public List<Reservation> findByHostId(Host host) throws DataException {
+        List<Reservation> result = new ArrayList<>();
+        Path reservationFilePath = Paths.get(directory, host.getId() + ".csv");
+
+        if (!Files.exists(reservationFilePath)) {
+            return result;
+        }
+
+        try (BufferedReader reader = Files.newBufferedReader(reservationFilePath)) {
+            reader.readLine(); //skip header
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                result.add(deserialize(line));
+            }
+        } catch (IOException ex) {
+            //don't throw on read
+        }
+
+        return result;
     }
 
     @Override

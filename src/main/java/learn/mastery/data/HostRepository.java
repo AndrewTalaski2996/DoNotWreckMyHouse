@@ -10,6 +10,4 @@ public interface HostRepository {
     public List<Host> findAll() throws DataException;
 
     public Host findById(String id) throws DataException;
-
-    public List<Reservation> findReservations(Host host) throws DataException;
 }

@@ -1,6 +1,7 @@
 package learn.mastery.models;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,7 +15,7 @@ public class Host {
     private String city;
     private String state;
     private String zip_code;
-    private List<Reservation> reservations;
+    private List<Reservation> reservations = new ArrayList<>();
     private BigDecimal standard_rate;
     private BigDecimal weekend_rate;
 

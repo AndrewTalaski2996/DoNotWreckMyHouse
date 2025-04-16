@@ -46,14 +46,6 @@ public class HostFileRepository implements HostRepository{
                 .orElse(null);
     }
 
-    @Override
-    public List<Reservation> findReservations(Host host) throws DataException {
-        return Objects.requireNonNull(findAll().stream()
-                .filter(h -> Objects.equals(h.getId(), host.getId()))
-                .findFirst()
-                .orElse(null)).getReservations();
-    }
-
     private void writeAll(List<Host> hosts) throws DataException {
         try (PrintWriter writer = new PrintWriter(directory)) {
             writer.println(HEADER);
@@ -97,8 +89,8 @@ public class HostFileRepository implements HostRepository{
         result.setCity(restore(fields[5]));
         result.setState(restore(fields[6]));
         result.setZip_code(restore(fields[7]));
-        result.setStandard_rate(BigDecimal.valueOf(Long.parseLong(fields[8])));
-        result.setWeekend_rate(BigDecimal.valueOf(Long.parseLong(fields[9])));
+        result.setStandard_rate(BigDecimal.valueOf(Double.parseDouble(fields[8])));
+        result.setWeekend_rate(BigDecimal.valueOf(Double.parseDouble(fields[9])));
         return result;
     }
 

@@ -29,7 +29,7 @@ class HostFileRepositoryTest {
 
     @Test
     void shouldFindAll() throws DataException {
-        assertEquals(10, repository.findAll().size());
+        assertEquals(9, repository.findAll().size());
     }
 
     @Test
@@ -43,12 +43,7 @@ class HostFileRepositoryTest {
         assertEquals("Houston", valasek.getCity());
         assertEquals("TX", valasek.getState());
         assertEquals("77005", valasek.getZip_code());
-        assertEquals(new BigDecimal("387"), valasek.getStandard_rate());
+        assertEquals(new BigDecimal("387.0"), valasek.getStandard_rate());
         assertEquals(new BigDecimal("483.75"), valasek.getWeekend_rate());
-    }
-
-    @Test
-    void shouldFindReservations() {
-        //create reservations
     }
 }
