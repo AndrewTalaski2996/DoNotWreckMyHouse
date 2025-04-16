@@ -60,7 +60,11 @@ public class ReservationFileRepository implements ReservationRepository{
         try (BufferedReader reader = Files.newBufferedReader(reservationFilePath)) {
             reader.readLine(); //skip header
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                result.add(deserialize(line));
+                Reservation res = deserialize(line);
+                if (res != null) {
+                    res.setHost(host);
+                }
+                result.add(res);
             }
         } catch (IOException ex) {
             //don't throw on read
