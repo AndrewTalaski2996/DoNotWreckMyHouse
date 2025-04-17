@@ -1,17 +1,21 @@
 package learn.mastery.domain;
 
+import learn.mastery.models.Reservation;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Result<T> {
-
-    private T payload;
-
-    public T getPayload() { return payload; }
-
-    public void setPayload(T payload) { this.payload = payload; }
+public class Result {
 
     private ArrayList<String> messages = new ArrayList<>();
+
+    private Reservation reservation;
+
+    public Reservation getReservation() { return reservation; }
+
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
+    }
 
     public boolean isSuccess() { return messages.isEmpty(); }
 

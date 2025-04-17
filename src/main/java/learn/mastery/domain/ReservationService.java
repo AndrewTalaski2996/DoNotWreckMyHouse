@@ -33,35 +33,36 @@ public class ReservationService {
         return reservationRepository.findByHostId(host);
     }
 
-    public Result<Reservation> addReservation(Reservation reservation) throws DataException {
-        Result<Reservation> result = validate(reservation);
+    public Result addReservation(Reservation reservation) throws DataException {
+        Result result = validate(reservation);
+
         if (!result.isSuccess()) {
             return result;
         }
 
-        if (!LocalDate.now().isAfter(result.getPayload().getStart_date())) {
+        if (!LocalDate.now().isBefore(reservation.getStart_date())) {
             result.addMessages("Start Date must be in the future.");
             return result;
         }
 
-        result.setPayload(reservationRepository.create(reservation));
+        result.setReservation(reservationRepository.create(reservation));
 
         return result;
     }
 
-    public Result<Reservation> updateReservation(Reservation reservation) throws DataException {
-        Result<Reservation> result = validate(reservation);
+    public Result updateReservation(Reservation reservation) throws DataException {
+        Result result = validate(reservation);
         if (!result.isSuccess()) {
             return result;
         }
 
-        result.setPayload(reservationRepository.create(reservation));
+        result.setReservation(reservationRepository.create(reservation));
 
         return result;
     }
 
-    public Result<Reservation> removeReservationById(int reservation_id) throws DataException {
-        Result<Reservation> result = new Result<>();
+    public Result removeReservationById(int reservation_id) throws DataException {
+        Result result = new Result();
 
         if (reservationRepository.findById(reservation_id).getStart_date().isBefore(LocalDate.now())) {
             result.addMessages("You cannot delete a past reservation.");
@@ -74,28 +75,33 @@ public class ReservationService {
         return result;
     }
 
-    public Result<Reservation> validate(Reservation reservation) throws DataException {
-        Result<Reservation> result = new Result<>();
+    public Result validate(Reservation reservation) throws DataException {
+        Result result = new Result();
 
         if (reservation == null) {
             result.addMessages("Reservation cannot be null.");
+            return result;
         }
 
         //need guest, host and start and end dates
         if (reservation.getGuestId() <= 0) {
             result.addMessages("Guest Id is required.");
+            return result;
         }
 
         if (reservation.getHost() == null) {
             result.addMessages("Host is required.");
+            return result;
         }
 
         if (reservation.getStart_date() == null) {
             result.addMessages("Start Date is required.");
+            return result;
         }
 
         if (reservation.getEnd_date() == null) {
-            result.addMessages("End date is required.");
+            result.addMessages("End Date is required.");
+            return result;
         }
 
         //guest and host must already exist
@@ -108,6 +114,7 @@ public class ReservationService {
         }
         if (!hasGuest) {
             result.addMessages("Guest is required.");
+            return result;
         }
 
         boolean hasHost = false;
@@ -119,11 +126,13 @@ public class ReservationService {
         }
         if (!hasHost) {
             result.addMessages("Host is required.");
+            return result;
         }
 
         //start date must come before end date
         if (reservation.getStart_date().isAfter(reservation.getEnd_date())) {
             result.addMessages("Start Date must be before End Date.");
+            return result;
         }
 
         //reservation may not overlap existing dates
