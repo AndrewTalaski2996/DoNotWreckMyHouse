@@ -39,9 +39,9 @@ public class HostFileRepository implements HostRepository{
     }
 
     @Override
-    public Host findById(String id) throws DataException {
+    public Host findByEmail(String email) throws DataException {
         return findAll().stream()
-                .filter(h -> h.getId().equals(id))
+                .filter(h -> h.getEmail().equals(email))
                 .findFirst()
                 .orElse(null);
     }

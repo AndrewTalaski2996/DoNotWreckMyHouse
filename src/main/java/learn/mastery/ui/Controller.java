@@ -66,14 +66,15 @@ public class Controller {
     }
 
     private void showReservations_Controller() throws DataException {
-        String hostId = view.getHost();
-        Host host = hostService.findById(hostId); //or email??
-        //view.displayHost and their reservations
-        //entertocontinue
+        view.displayHeader("View Reservations By Host");
+        String hostEmail = view.getHostByEmail();
+        Host host = hostService.findHostWithReservations(hostEmail);
+        view.displayHostAndReservations(host);
+        view.enterToContinue();
     }
 
     private void makeReservation_Controller() {
-        //header
+        view.displayHeader("Make a Reservation");
         //make new reservation
             //need to have a readLocalDate
         //result = reservation service.add reservation
@@ -81,7 +82,7 @@ public class Controller {
     }
 
     private void editReservation_Controller() {
-        //header
+        view.displayHeader("Change a Reservation");
         //find reservation
             //getHost and getGuest by id/email
         //view.displayhost and reservations
@@ -91,7 +92,7 @@ public class Controller {
     }
 
     private void cancelReservation_Controller() {
-        //header
+        view.displayHeader("Cancel Reservation");
         //find reservation
             //getHost and getGuest by id/email
         //view.displayHost and reservation

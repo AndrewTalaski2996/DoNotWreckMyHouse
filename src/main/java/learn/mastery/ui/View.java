@@ -1,6 +1,7 @@
 package learn.mastery.ui;
 
 import learn.mastery.models.Host;
+import learn.mastery.models.Reservation;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,9 +27,8 @@ public class View {
 
     //cancelReservation_View
 
-    public String getHost() {
-        displayHeader("View reservations for Host");
-        return ""; //io.readString
+    public String getHostByEmail() {
+        return null;
     }
 
     public void displayHeader(String message) {
@@ -48,5 +48,11 @@ public class View {
 
     //displayStatus
 
-    //displayHostAndReservations
+    public void displayHostAndReservations(Host host) {
+        displayHeader(host.getLast_name() + ": " + host.getCity() + ", " + host.getState());
+        for (Reservation res : host.getReservations()) {
+            displayText("ID: " + res.getId() + ", " + res.getStart_date() + " - " + res.getEnd_date() +
+                    ", Guest ID: " + res.getGuestId());
+        }
+    }
 }

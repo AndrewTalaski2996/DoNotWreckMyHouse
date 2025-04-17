@@ -2,12 +2,17 @@ package learn.mastery.ui;
 
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 @Component
 public class ConsoleIO {
 
     private final Scanner console = new Scanner(System.in);
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     public void print(String message) {
         System.out.print(message);
@@ -44,7 +49,35 @@ public class ConsoleIO {
 
     //readInt
 
-    //readLocalDate
+    public LocalDate readLocalDate(String prompt) {
+        while (true) {
+            String input = readRequiredString(prompt);
+            try {
+                return LocalDate.parse(input, formatter);
+            } catch (DateTimeParseException ex) {
+                println("This is not a valid date.");
+            }
+        }
+    }
 
-    //readBigDecimal
+    public BigDecimal readBigDecimal(String prompt) {
+        while (true) {
+            String input = readRequiredString(prompt);
+            try {
+                return new BigDecimal(input);
+            } catch (NumberFormatException ex) {
+                println("This is not a valid number.");
+            }
+        }
+    }
+
+    public BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max) {
+        while (true) {
+            BigDecimal result = readBigDecimal(prompt);
+            if (result.compareTo(min) >= 0 && result.compareTo(max) <= 0) {
+                return result;
+            }
+            println(String.format("Number should be between %s and %s.", min, max));
+        }
+    }
 }

@@ -1,7 +1,5 @@
 package learn.mastery.models;
 
-import org.springframework.cglib.core.Local;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;

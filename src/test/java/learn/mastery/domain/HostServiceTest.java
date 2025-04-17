@@ -1,8 +1,10 @@
 package learn.mastery.domain;
 
 import learn.mastery.data.DataException;
+import learn.mastery.data.GuestRepositoryDouble;
 import learn.mastery.data.HostRepositoryDouble;
 import learn.mastery.data.ReservationRepositoryDouble;
+import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,7 @@ class HostServiceTest {
 
     @Test
     void shouldFindById() throws DataException {
-        Host host = service.findById("test_id");
+        Host host = service.findByEmail("email@gmail.com");
         assertNotNull(host);
         assertEquals("Talaski", host.getLast_name());
         assertEquals("TC", host.getState());
@@ -27,18 +29,18 @@ class HostServiceTest {
 
     @Test
     void shouldNotFindById() throws DataException {
-        Host host = service.findById("12984jdi1kwd1");
+        Host host = service.findByEmail("12984jdi1kwd1");
         assertNull(host);
     }
 
     @Test
     void shouldFindHostWithReservations() throws DataException {
-        Host host = service.findById("test_id");
+        Host host = service.findByEmail("email@gmail.com");
         List<Reservation> reservations = new ReservationRepositoryDouble().findByHostId(host);
         assertNotNull(host);
         assertNotNull(reservations);
 
-        host = service.findHostWithReservations("test_id");
+        host = service.findHostWithReservations("email@gmail.com");
         assertNotNull(host);
         assertEquals(reservations.get(0), host.getReservations().get(0));
     }

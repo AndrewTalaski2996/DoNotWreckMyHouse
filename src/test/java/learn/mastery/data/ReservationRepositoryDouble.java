@@ -1,5 +1,6 @@
 package learn.mastery.data;
 
+import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 

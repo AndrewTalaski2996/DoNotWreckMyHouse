@@ -9,5 +9,5 @@ public interface HostRepository {
 
     public List<Host> findAll() throws DataException;
 
-    public Host findById(String id) throws DataException;
+    public Host findByEmail(String email) throws DataException;
 }

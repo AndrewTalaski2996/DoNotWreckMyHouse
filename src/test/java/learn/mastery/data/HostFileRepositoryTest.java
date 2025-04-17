@@ -34,7 +34,7 @@ class HostFileRepositoryTest {
 
     @Test
     void shouldFindById() throws DataException {
-        Host valasek = repository.findById("d491d4c3-e005-4494-9c52-4d3be265fd76");
+        Host valasek = repository.findByEmail("hvalasek5@fastcompany.com");
         assertNotNull(valasek);
         assertEquals("Valasek", valasek.getLast_name());
         assertEquals("hvalasek5@fastcompany.com", valasek.getEmail());

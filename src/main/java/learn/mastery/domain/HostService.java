@@ -20,12 +20,12 @@ public class HostService {
         this.reservationRepository = reservationRepository;
     }
 
-    public Host findById(String id) throws DataException {
-        return repository.findById(id);
+    public Host findByEmail(String email) throws DataException {
+        return repository.findByEmail(email);
     }
 
-    public Host findHostWithReservations(String host_id) throws DataException {
-        Host host = repository.findById(host_id);
+    public Host findHostWithReservations(String email) throws DataException {
+        Host host = repository.findByEmail(email);
         if (host != null) {
             List<Reservation> reservations = reservationRepository.findByHostId(host);
             host.setReservations(reservations);

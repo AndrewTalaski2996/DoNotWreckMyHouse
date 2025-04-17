@@ -1,5 +1,6 @@
 package learn.mastery.data;
 
+import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,7 @@ import java.util.List;
 @Repository
 public class ReservationFileRepository implements ReservationRepository{
 
-    private static final String HEADER = "id,start_date,end_date,guest,total";
+    private static final String HEADER = "id,start_date,end_date,guest_id,total";
     private static final String DELIMITER = ",";
     private final String directory;
 
@@ -61,6 +62,7 @@ public class ReservationFileRepository implements ReservationRepository{
             reader.readLine(); //skip header
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 Reservation res = deserialize(line);
+
                 if (res != null) {
                     res.setHost(host);
                 }
