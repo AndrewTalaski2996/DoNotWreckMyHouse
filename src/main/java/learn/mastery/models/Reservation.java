@@ -10,6 +10,7 @@ public class Reservation {
     private LocalDate start_date;
     private LocalDate end_date;
     private int guest_id;
+    private Guest guest;
     private Host host;
     private BigDecimal total;
 
@@ -53,6 +54,14 @@ public class Reservation {
 
     public void setGuestId(int guest_id) {
         this.guest_id = guest_id;
+    }
+
+    public Guest getGuest() {
+        return guest;
+    }
+
+    public void setGuest(Guest guest) {
+        this.guest = guest;
     }
 
     public Host getHost() {

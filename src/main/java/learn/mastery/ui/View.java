@@ -52,7 +52,8 @@ public class View {
         displayHeader(host.getLast_name() + ": " + host.getCity() + ", " + host.getState());
         for (Reservation res : host.getReservations()) {
             displayText("ID: " + res.getId() + ", " + res.getStart_date() + " - " + res.getEnd_date() +
-                    ", Guest ID: " + res.getGuestId());
+                    ", Guest: " + res.getGuest().getLast_name() + ", " + res.getGuest().getFirst_name() +
+                    " Email: " + res.getGuest().getEmail());
         }
     }
 }

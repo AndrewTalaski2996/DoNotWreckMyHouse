@@ -21,9 +21,11 @@ public class ReservationFileRepository implements ReservationRepository{
     private static final String HEADER = "id,start_date,end_date,guest_id,total";
     private static final String DELIMITER = ",";
     private final String directory;
+    private final GuestRepository guestRepository;
 
-    public ReservationFileRepository(@Value("${reservationRepository}") String directory) {
+    public ReservationFileRepository(@Value("${reservationRepository}") String directory, GuestRepository guestRepository) {
         this.directory = directory;
+        this.guestRepository = guestRepository;
     }
 
     @Override
@@ -138,7 +140,7 @@ public class ReservationFileRepository implements ReservationRepository{
         return buffer.toString();
     }
 
-    private Reservation deserialize(String line) {
+    private Reservation deserialize(String line) throws DataException {
         String[] fields = line.split(DELIMITER);
 
         if (fields.length != 5) {
@@ -150,6 +152,12 @@ public class ReservationFileRepository implements ReservationRepository{
         result.setStart_date(LocalDate.parse(fields[1]));
         result.setEnd_date(LocalDate.parse(fields[2]));
         result.setGuestId(Integer.parseInt(fields[3]));
+
+        Guest guest = guestRepository.findById(result.getGuestId());
+        if (guest != null) {
+            result.setGuest(guest);
+        }
+
         result.setTotal(BigDecimal.valueOf(Long.parseLong(fields[4])));
         return result;
     }
