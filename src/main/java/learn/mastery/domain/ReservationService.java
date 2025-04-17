@@ -25,6 +25,10 @@ public class ReservationService {
         this.hostRepository = hostRepository;
     }
 
+    public List<Reservation> findAll() throws DataException {
+        return reservationRepository.findAll();
+    }
+
     public Reservation findById(int id) throws DataException {
         return reservationRepository.findById(id);
     }
@@ -42,6 +46,13 @@ public class ReservationService {
 
         if (!LocalDate.now().isBefore(reservation.getStart_date())) {
             result.addMessages("Start Date must be in the future.");
+            return result;
+        }
+
+        reservation.setId(reservationRepository.generateNextId());
+
+        if (reservation.getId() <= 0) {
+            result.addMessages("ID cannot be negative or zero.");
             return result;
         }
 

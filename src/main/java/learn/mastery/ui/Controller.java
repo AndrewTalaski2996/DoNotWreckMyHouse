@@ -4,6 +4,8 @@ import learn.mastery.data.DataException;
 import learn.mastery.domain.GuestService;
 import learn.mastery.domain.HostService;
 import learn.mastery.domain.ReservationService;
+import learn.mastery.domain.Result;
+import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 import org.springframework.stereotype.Component;
@@ -73,22 +75,36 @@ public class Controller {
         view.enterToContinue();
     }
 
-    private void makeReservation_Controller() {
+    private void makeReservation_Controller() throws DataException {
         view.displayHeader("Make a Reservation");
-        //make new reservation
-            //need to have a readLocalDate
-        //result = reservation service.add reservation
-        //view.displayStatus
+        Host host = view.chooseHost(hostService.findAll()); //choose host
+        Guest guest = view.chooseGuest(guestService.findAll()); //choose guest
+        Reservation reservation = view.makeReservation_View(host, guest);
+        Result result = reservationService.addReservation(reservation);
+        if (!result.isSuccess()) {
+            view.displayStatus(false, result.getErrorMessages());
+        } else {
+            view.displayStatus(true, "Reservation created.");
+        }
+        view.enterToContinue();
     }
 
-    private void editReservation_Controller() {
+    //RE-EXAMINE LOGIC HERE
+    private void editReservation_Controller() throws DataException {
         view.displayHeader("Change a Reservation");
-        //find reservation
-            //getHost and getGuest by id/email
-        //view.displayhost and reservations
-        //null/not found check
-            //result = service.update reservation
-            //view.displayStatus
+
+        Host host = view.chooseHost(hostService.findAll());
+        Guest guest = view.chooseGuest(guestService.findAll());
+        Reservation reservation = view.findReservation(host, guest, reservationService.findAll());
+        reservation = view.editReservation_View(reservation);
+
+        Result result = reservationService.updateReservation(reservation);
+        if (!result.isSuccess()) {
+            view.displayStatus(false, result.getErrorMessages());
+        } else {
+            view.displayStatus(true, "Reservation updated.");
+        }
+        view.enterToContinue();
     }
 
     private void cancelReservation_Controller() {

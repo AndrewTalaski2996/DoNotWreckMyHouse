@@ -1,8 +1,13 @@
 package learn.mastery.ui;
 
+import learn.mastery.domain.Result;
+import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class View {
@@ -19,13 +24,66 @@ public class View {
         return io.readIntForMenu("Select [0-4]: ");
     }
 
-    //viewReservations
+    public Reservation makeReservation_View(Host host, Guest guest) {
+        Reservation reservation = new Reservation();
+        reservation.setStart_date(io.readLocalDate("Start Date [MM/dd/yyyy]: "));
+        reservation.setEnd_date(io.readLocalDate("End Date [MM/dd/yyyy]: "));
+        reservation.setGuestId(guest.getGuest_id());
+        reservation.setGuest(guest);
+        reservation.setHost(host);
+        reservation.setTotal(reservation.calculateTotal());
+        return reservation;
+    }
 
-    //makeReservation_View
+    public Host chooseHost(List<Host> hosts) {
+        if (hosts.isEmpty()) {
+            io.println("No Hosts found.");
+            return null;
+        }
 
-    //editReservation_View
+        String host_email = io.readRequiredString("Enter a Host's email: ");
+        return hosts.stream()
+                .filter(h -> h.getEmail().equals(host_email))
+                .findFirst()
+                .orElse(null);
+    }
 
-    //cancelReservation_View
+    public Guest chooseGuest(List<Guest> guests) {
+        if (guests.isEmpty()) {
+            io.println("No Guests found.");
+            return null;
+        }
+
+        String guest_email = io.readRequiredString("Enter the guest's email: ");
+        return guests.stream()
+                .filter(g -> g.getEmail().equals(guest_email))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Reservation editReservation_View(Reservation reservation) {
+        displayText("Editing");
+        String startDate = io.readRequiredString("Start Date: ");
+        if (!startDate.isBlank()) {
+            reservation.setStart_date(LocalDate.parse(startDate));
+        }
+        String endDate = io.readRequiredString("End Date: ");
+        if (!endDate.isBlank()) {
+            reservation.setEnd_date(LocalDate.parse(endDate));
+        }
+        return reservation;
+    }
+
+    public Reservation findReservation(Host host, Guest guest, List<Reservation> reservations) {
+        return reservations.stream()
+                .filter(r -> r.getHost().getEmail().equals(host.getEmail()) && r.getGuest().getEmail().equals(guest.getEmail()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Result cancelReservation_View() {
+        return null;
+    }
 
     public String getHostByEmail() {
         return null;
@@ -37,8 +95,6 @@ public class View {
         io.println("#".repeat(message.length()));
     }
 
-    //other helper methods
-
     public void enterToContinue() { io.readString("Press [Enter] to continue."); }
 
     public void displayText(String line) {
@@ -46,7 +102,16 @@ public class View {
         System.out.println(line);
     }
 
-    //displayStatus
+    public void displayStatus(boolean success, String message) {
+        displayStatus(success, List.of(message));
+    }
+
+    public void displayStatus(boolean success, List<String> messages) {
+        displayHeader(success ? "Success" : "Error");
+        for (String message : messages) {
+            io.println(message);
+        }
+    }
 
     public void displayHostAndReservations(Host host) {
         displayHeader(host.getLast_name() + ": " + host.getCity() + ", " + host.getState());

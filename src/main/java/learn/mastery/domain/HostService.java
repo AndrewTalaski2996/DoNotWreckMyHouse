@@ -20,6 +20,10 @@ public class HostService {
         this.reservationRepository = reservationRepository;
     }
 
+    public List<Host> findAll() throws DataException {
+        return repository.findAll();
+    }
+
     public Host findByEmail(String email) throws DataException {
         return repository.findByEmail(email);
     }

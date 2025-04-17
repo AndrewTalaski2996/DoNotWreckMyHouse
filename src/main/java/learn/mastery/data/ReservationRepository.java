@@ -19,4 +19,6 @@ public interface ReservationRepository {
     public boolean update(Reservation reservation) throws DataException;
 
     public boolean deleteById(int id) throws DataException;
+
+    public int generateNextId() throws DataException;
 }

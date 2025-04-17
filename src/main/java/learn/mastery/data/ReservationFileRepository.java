@@ -118,6 +118,10 @@ public class ReservationFileRepository implements ReservationRepository{
         return false;
     }
 
+    public int generateNextId() throws DataException {
+        return findAll().get(findAll().size()-1).getId() + 1;
+    }
+
     private void writeAll(List<Reservation> reservations) throws DataException {
         try (PrintWriter writer = new PrintWriter(directory)) {
             writer.println(HEADER);
