@@ -19,7 +19,7 @@ class ReservationServiceTest {
 
     @Test
     void shouldFindById() throws DataException {
-        Reservation result = service.findById(1);
+        Reservation result = service.findById(1, HOST);
         assertNotNull(result);
         assertEquals(1, result.getGuestId());
     }

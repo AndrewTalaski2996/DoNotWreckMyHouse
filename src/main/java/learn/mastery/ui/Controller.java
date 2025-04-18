@@ -10,8 +10,6 @@ import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class Controller {
 
@@ -69,51 +67,123 @@ public class Controller {
 
     private void showReservations_Controller() throws DataException {
         view.displayHeader("View Reservations By Host");
-        String hostEmail = view.getHostByEmail();
-        Host host = hostService.findHostWithReservations(hostEmail);
+
+        String email = view.getHostByEmail();
+        Host host = hostService.findHostWithReservations(email);
         view.displayHostAndReservations(host);
+
         view.enterToContinue();
     }
 
     private void makeReservation_Controller() throws DataException {
         view.displayHeader("Make a Reservation");
-        Host host = view.chooseHost(hostService.findAll()); //choose host
-        Guest guest = view.chooseGuest(guestService.findAll()); //choose guest
+
+        Guest guest = getGuest();
+        if (guest == null) {
+            return;
+        }
+
+        Host host = getHost();
+        if (host == null) {
+            return;
+        }
+
+        view.displayHostAndReservations(host);
+
         Reservation reservation = view.makeReservation_View(host, guest);
+
         Result result = reservationService.addReservation(reservation);
+
         if (!result.isSuccess()) {
             view.displayStatus(false, result.getErrorMessages());
         } else {
-            view.displayStatus(true, "Reservation created.");
+            view.displayHeader("Summary");
+            view.displayText("Start Date: " + result.getReservation().getStart_date());
+            view.displayText("End Date: " + result.getReservation().getEnd_date());
+            view.displayText(String.format("Total: $%.2f", result.getReservation().calculateTotal()));
+
+            Result confirm = view.confirmUserChoice_View("Are you sure? [y/n]: ");
+
+            if (!confirm.isSuccess()) {
+                view.displayText( "Reservation creation aborted.");
+            } else {
+                view.displayStatus(true, "Reservation created.");
+            }
         }
         view.enterToContinue();
     }
 
-    //RE-EXAMINE LOGIC HERE
     private void editReservation_Controller() throws DataException {
         view.displayHeader("Change a Reservation");
 
-        Host host = view.chooseHost(hostService.findAll());
-        Guest guest = view.chooseGuest(guestService.findAll());
-        Reservation reservation = view.findReservation(host, guest, reservationService.findAll());
-        reservation = view.editReservation_View(reservation);
+        Guest guest = getGuest();
+        if (guest == null) {
+            return;
+        }
+
+        Host host = getHost();
+        if (host == null) {
+            return;
+        }
+
+        Reservation reservation = view.editReservation_View(host, guest, reservationService.findByHostId(host));
 
         Result result = reservationService.updateReservation(reservation);
         if (!result.isSuccess()) {
             view.displayStatus(false, result.getErrorMessages());
         } else {
-            view.displayStatus(true, "Reservation updated.");
+            view.displayHeader("Summary");
+            view.displayText("New Start Date: " + result.getReservation().getStart_date());
+            view.displayText("New End Date: " + result.getReservation().getEnd_date());
+            view.displayText(String.format("New Total: $%.2f", result.getReservation().calculateTotal()));
+
+            Result confirm = view.confirmUserChoice_View("Are you sure? [y/n]: ");
+
+            if (!confirm.isSuccess()) {
+                view.displayText("Reservation edit aborted.");
+            } else {
+                view.displayStatus(true, "Reservation updated.");
+            }
         }
         view.enterToContinue();
     }
 
-    private void cancelReservation_Controller() {
+    private void cancelReservation_Controller() throws DataException {
         view.displayHeader("Cancel Reservation");
-        //find reservation
-            //getHost and getGuest by id/email
-        //view.displayHost and reservation
-        //null/not found check
-            //result = service.remove reservation
-            //view.displayStatus
+
+        Guest guest = getGuest();
+        if (guest == null) {
+            return;
+        }
+
+        Host host = getHost();
+        if (host == null) {
+            return;
+        }
+
+        Reservation reservation = view.removeReservation_View(host, guest, reservationService.findByHostId(host));
+
+        Result confirm = view.confirmUserChoice_View("Are you sure? [y/n]: ");
+
+        if (!confirm.isSuccess()) {
+            view.displayText("Reservation removal aborted.");
+            return;
+        }
+
+        Result result = reservationService.removeReservationById(reservation.getId(), host);
+        if (!result.isSuccess()) {
+            view.displayStatus(false, result.getErrorMessages());
+        } else {
+            view.displayStatus(true, "Reservation removed.");
+        }
+        view.enterToContinue();
+    }
+
+    private Host getHost() throws DataException {
+         return view.chooseHost(hostService);
+    }
+
+    private Guest getGuest() throws DataException {
+        return view.chooseGuest(guestService.findAll());
     }
 }

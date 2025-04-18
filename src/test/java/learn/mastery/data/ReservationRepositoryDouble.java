@@ -22,7 +22,7 @@ public class ReservationRepositoryDouble implements ReservationRepository {
     }
 
     @Override
-    public Reservation findById(int id) throws DataException {
+    public Reservation findById(int id, Host host) throws DataException {
         return findAll().stream()
                 .filter(r -> r.getId() == id)
                 .findFirst()
@@ -56,7 +56,7 @@ public class ReservationRepositoryDouble implements ReservationRepository {
     }
 
     @Override
-    public boolean deleteById(int id) throws DataException {
+    public boolean deleteById(int id, Host host) throws DataException {
         List<Reservation> all = findAll();
 
         for (int i = 0; i < all.size(); i++) {
@@ -67,5 +67,10 @@ public class ReservationRepositoryDouble implements ReservationRepository {
         }
 
         return false;
+    }
+
+    @Override
+    public int generateNextId() throws DataException {
+        return 2;
     }
 }

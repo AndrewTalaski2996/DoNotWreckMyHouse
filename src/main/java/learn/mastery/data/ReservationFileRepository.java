@@ -13,7 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class ReservationFileRepository implements ReservationRepository{
@@ -44,8 +46,8 @@ public class ReservationFileRepository implements ReservationRepository{
     }
 
     @Override
-    public Reservation findById(int id) throws DataException {
-        return findAll().stream()
+    public Reservation findById(int id, Host host) throws DataException {
+        return findByHostId(host).stream()
                 .filter(r -> r.getId() == id)
                 .findFirst()
                 .orElse(null);
@@ -74,7 +76,9 @@ public class ReservationFileRepository implements ReservationRepository{
             //don't throw on read
         }
 
-        return result;
+        return result.stream()
+                .sorted(Comparator.comparing(Reservation::getStart_date))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -84,21 +88,21 @@ public class ReservationFileRepository implements ReservationRepository{
             return null;
         }
 
-        List<Reservation> all = findAll();
+        List<Reservation> all = reservation.getHost().getReservations();
 
         all.add(reservation);
-        writeAll(all);
+        writeAll(all, reservation.getHost().getId());
 
         return reservation;
     }
 
     @Override
     public boolean update(Reservation reservation) throws DataException {
-        List<Reservation> all = findAll();
+        List<Reservation> all = reservation.getHost().getReservations();
         for (int i = 0; i < all.size(); i++) {
             if (all.get(i).getId() == reservation.getId()) {
                 all.set(i, reservation);
-                writeAll(all);
+                writeAll(all, reservation.getHost().getId());
                 return true;
             }
         }
@@ -106,12 +110,12 @@ public class ReservationFileRepository implements ReservationRepository{
     }
 
     @Override
-    public boolean deleteById(int id) throws DataException {
-        List<Reservation> all = findAll();
+    public boolean deleteById(int id, Host host) throws DataException {
+        List<Reservation> all = findByHostId(host);
         for (int i = 0; i < all.size(); i++) {
             if (all.get(i).getId() == id) {
                 all.remove(i);
-                writeAll(all);
+                writeAll(all, all.get(0).getHost().getId());
                 return true;
             }
         }
@@ -119,29 +123,31 @@ public class ReservationFileRepository implements ReservationRepository{
     }
 
     public int generateNextId() throws DataException {
-        return findAll().get(findAll().size()-1).getId() + 1;
+        List<Reservation> all = findAll();
+        if (all.isEmpty()) return 1;
+        return all.get(all.size() - 1).getId() + 1;
     }
 
-    private void writeAll(List<Reservation> reservations) throws DataException {
-        try (PrintWriter writer = new PrintWriter(directory)) {
+    private void writeAll(List<Reservation> reservations, String fileName) throws DataException {
+        try (PrintWriter writer = new PrintWriter(Files.newBufferedWriter(Paths.get(directory, fileName + ".csv")))) {
             writer.println(HEADER);
 
             for (Reservation reservation : reservations) {
                 writer.println(serialize(reservation));
             }
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             throw new DataException(ex);
         }
     }
 
     private String serialize(Reservation reservation) {
-        StringBuffer buffer = new StringBuffer(100);
-        buffer.append(reservation.getId()).append(DELIMITER);
-        buffer.append(reservation.getStart_date()).append(DELIMITER);
-        buffer.append(reservation.getEnd_date()).append(DELIMITER);
-        buffer.append(reservation.getGuestId()).append(DELIMITER);
-        buffer.append(reservation.getTotal()).append(DELIMITER);
-        return buffer.toString();
+        StringBuilder builder = new StringBuilder(100);
+        builder.append(reservation.getId()).append(DELIMITER)
+                .append(reservation.getStart_date()).append(DELIMITER)
+                .append(reservation.getEnd_date()).append(DELIMITER)
+                .append(reservation.getGuestId()).append(DELIMITER)
+                .append(reservation.getTotal());
+        return builder.toString();
     }
 
     private Reservation deserialize(String line) throws DataException {
@@ -162,7 +168,7 @@ public class ReservationFileRepository implements ReservationRepository{
             result.setGuest(guest);
         }
 
-        result.setTotal(BigDecimal.valueOf(Long.parseLong(fields[4])));
+        result.setTotal(BigDecimal.valueOf(Double.parseDouble(fields[4])));
         return result;
     }
 }

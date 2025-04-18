@@ -2,7 +2,6 @@ package learn.mastery.ui;
 
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -39,15 +38,16 @@ public class ConsoleIO {
 
     public int readIntForMenu(String prompt) {
         while (true) {
-            int result = Integer.parseInt(readRequiredString(prompt));
-            if (result >= 0 && result <= 4) {
-                return result;
+            try {
+                int result = Integer.parseInt(readRequiredString(prompt));
+                if (result >= 0 && result <= 4) {
+                    return result;
+                }
+            } catch (NumberFormatException ex) {
+                println("That is not a valid option.");
             }
-            println("That is not a valid option.");
         }
     }
-
-    //readInt
 
     public LocalDate readLocalDate(String prompt) {
         while (true) {
@@ -60,24 +60,15 @@ public class ConsoleIO {
         }
     }
 
-    public BigDecimal readBigDecimal(String prompt) {
+    public boolean confirm(String prompt) {
         while (true) {
-            String input = readRequiredString(prompt);
-            try {
-                return new BigDecimal(input);
-            } catch (NumberFormatException ex) {
-                println("This is not a valid number.");
+            String confirm = readRequiredString(prompt);
+            if (confirm.equalsIgnoreCase("y")) {
+                return true;
+            } else if (confirm.equalsIgnoreCase("n")) {
+                return false;
             }
-        }
-    }
-
-    public BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max) {
-        while (true) {
-            BigDecimal result = readBigDecimal(prompt);
-            if (result.compareTo(min) >= 0 && result.compareTo(max) <= 0) {
-                return result;
-            }
-            println(String.format("Number should be between %s and %s.", min, max));
+            println("That is not a valid choice.");
         }
     }
 }

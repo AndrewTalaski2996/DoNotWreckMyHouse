@@ -1,7 +1,6 @@
 package learn.mastery.data;
 
 import learn.mastery.models.Host;
-import learn.mastery.models.Reservation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -9,12 +8,10 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Repository
 public class HostFileRepository implements HostRepository{
 
-    private static final String HEADER = "id,last_name,email,phone,street_address,city,state,zip_code,standard_rate,weekend_rate";
     private static final String DELIMITER = ",";
     private static final String DELIMITER_REPLACEMENT = "@@@";
     private final String directory;
@@ -28,7 +25,6 @@ public class HostFileRepository implements HostRepository{
         ArrayList<Host> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(directory))) {
             reader.readLine(); //skip header
-
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 result.add(deserialize(line));
             }
@@ -63,11 +59,9 @@ public class HostFileRepository implements HostRepository{
 
     private Host deserialize(String line) {
         String[] fields = line.split(DELIMITER);
-
         if (fields.length != 10) {
             return null;
         }
-
         Host result = new Host();
         result.setId(restore(fields[0]));
         result.setLast_name(restore(fields[1]));

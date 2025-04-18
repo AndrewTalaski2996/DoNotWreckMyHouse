@@ -25,12 +25,12 @@ public class ReservationService {
         this.hostRepository = hostRepository;
     }
 
-    public List<Reservation> findAll() throws DataException {
+    public List<Reservation> findAll(Host host) throws DataException {
         return reservationRepository.findAll();
     }
 
-    public Reservation findById(int id) throws DataException {
-        return reservationRepository.findById(id);
+    public Reservation findById(int id, Host host) throws DataException {
+        return reservationRepository.findById(id, host);
     }
 
     public List<Reservation> findByHostId(Host host) throws DataException {
@@ -49,7 +49,7 @@ public class ReservationService {
             return result;
         }
 
-        reservation.setId(reservationRepository.generateNextId());
+        reservation.setId(reservationRepository.findByHostId(reservation.getHost()).size() + 1);
 
         if (reservation.getId() <= 0) {
             result.addMessages("ID cannot be negative or zero.");
@@ -72,14 +72,14 @@ public class ReservationService {
         return result;
     }
 
-    public Result removeReservationById(int reservation_id) throws DataException {
+    public Result removeReservationById(int reservation_id, Host host) throws DataException {
         Result result = new Result();
 
-        if (reservationRepository.findById(reservation_id).getStart_date().isBefore(LocalDate.now())) {
+        if (reservationRepository.findById(reservation_id, host).getStart_date().isBefore(LocalDate.now())) {
             result.addMessages("You cannot delete a past reservation.");
         }
 
-        if (!reservationRepository.deleteById(reservation_id)) {
+        if (!reservationRepository.deleteById(reservation_id, host)) {
             result.addMessages(String.format("Reservation with id: %s does not exist.", reservation_id));
         }
 
@@ -147,8 +147,11 @@ public class ReservationService {
         }
 
         //reservation may not overlap existing dates
-        for (Reservation res : reservationRepository.findAll()) {
-            if (reservation.getStart_date().isBefore(res.getStart_date()) && reservation.getEnd_date().isAfter(res.getEnd_date())) {
+        for (Reservation res : reservationRepository.findByHostId(reservation.getHost())) {
+            if (res.getId() == reservation.getId()) {
+                continue; //ignore the one we are editing for overlap check purposes.
+            }
+            if (!(reservation.getEnd_date().isBefore(res.getStart_date()) || res.getEnd_date().isBefore(reservation.getStart_date()))) {
                 result.addMessages("Reservation may not overlap with existing reservation.");
             }
         }

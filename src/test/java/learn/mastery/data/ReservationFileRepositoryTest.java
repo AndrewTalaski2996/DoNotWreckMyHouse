@@ -1,9 +1,9 @@
 package learn.mastery.data;
 
+import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.cglib.core.Local;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -18,10 +18,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReservationFileRepositoryTest {
 
     static final String SEED_PATH = "./data/reservation-seed.csv";
-    static final String TEST_PATH = "./data/reservations_test/9d469342-ad0b-4f5a-8d28-e81e690ba29a.csv";
-    static final String TEST_DIR = "./data/reservations_test";
+    static final String TEST_PATH = "./data/reservations_test/test_id.csv";
 
-    ReservationFileRepository repository = new ReservationFileRepository(TEST_PATH);
+    ReservationFileRepository repository = new ReservationFileRepository(TEST_PATH, new GuestRepositoryDouble());
 
     @BeforeEach
     void setup() throws IOException {
@@ -40,7 +39,8 @@ class ReservationFileRepositoryTest {
 
     @Test
     void shouldFindById() throws DataException {
-        Reservation result = repository.findById(1);
+        Host host = new Host();
+        Reservation result = repository.findById(1, host);
         assertNotNull(result);
         assertEquals(LocalDate.of(2020,7,1), result.getStart_date());
         assertEquals(LocalDate.of(2020, 7, 2), result.getEnd_date());
@@ -65,7 +65,7 @@ class ReservationFileRepositoryTest {
 
     @Test
     void shouldDeleteById() throws DataException {
-        assertTrue(repository.deleteById(1));
+        assertTrue(repository.deleteById(1, HostRepositoryDouble.HOST));
         assertEquals(0, repository.findAll().size());
     }
 }
