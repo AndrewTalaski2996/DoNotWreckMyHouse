@@ -69,8 +69,8 @@ public class Controller {
         view.displayHeader("View Reservations By Host");
 
         String email = view.getHostByEmail();
-        Host host = hostService.findHostWithReservations(email);
-        view.displayHostAndReservations(host);
+        Host host = hostService.findByEmail(email);
+        view.displayHostAndReservations(host, reservationService);
 
         view.enterToContinue();
     }
@@ -88,7 +88,7 @@ public class Controller {
             return;
         }
 
-        view.displayHostAndReservations(host);
+        view.displayHostAndReservations(host, reservationService);
 
         Reservation reservation = view.makeReservation_View(host, guest);
 

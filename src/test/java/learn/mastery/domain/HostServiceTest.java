@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HostServiceTest {
 
-    HostService service = new HostService(new HostRepositoryDouble(), new ReservationRepositoryDouble());
+    HostService service = new HostService(new HostRepositoryDouble());
 
     @Test
     void shouldFindById() throws DataException {
@@ -31,17 +31,5 @@ class HostServiceTest {
     void shouldNotFindById() throws DataException {
         Host host = service.findByEmail("12984jdi1kwd1");
         assertNull(host);
-    }
-
-    @Test
-    void shouldFindHostWithReservations() throws DataException {
-        Host host = service.findByEmail("email@gmail.com");
-        List<Reservation> reservations = new ReservationRepositoryDouble().findByHostId(host);
-        assertNotNull(host);
-        assertNotNull(reservations);
-
-        host = service.findHostWithReservations("email@gmail.com");
-        assertNotNull(host);
-        assertEquals(reservations.get(0), host.getReservations().get(0));
     }
 }

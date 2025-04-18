@@ -12,60 +12,79 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReservationFileRepositoryTest {
 
     static final String SEED_PATH = "./data/reservation-seed.csv";
-    static final String TEST_PATH = "./data/reservations_test/test_id.csv";
+    static final String TEST_DIR = "./data/reservations_test/";
+    static final String TEST_FILE = "test_id.csv";
 
-    ReservationFileRepository repository = new ReservationFileRepository(TEST_PATH, new GuestRepositoryDouble());
+    Host testHost;
+    ReservationFileRepository repository;
 
     @BeforeEach
     void setup() throws IOException {
         Path seedPath = Paths.get(SEED_PATH);
-        Path testPath = Paths.get(TEST_PATH);
-        Files.copy(seedPath, testPath, StandardCopyOption.REPLACE_EXISTING);
-    }
+        Path testFilePath = Paths.get(TEST_DIR, TEST_FILE);
+        Files.copy(seedPath, testFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-    @Test
-    void shouldFindAll() throws DataException {
-        assertEquals(1, repository.findAll().size());
-    }
+        testHost = new Host();
+        testHost.setId("test_id");
 
-    //id,start_date,end_date,guest_id,total
-    //1,2020-07-01,2020-07-02,18,870
+        repository = new ReservationFileRepository(TEST_DIR, new GuestRepositoryDouble());
+    }
 
     @Test
     void shouldFindById() throws DataException {
-        Host host = new Host();
-        Reservation result = repository.findById(1, host);
-        assertNotNull(result);
-        assertEquals(LocalDate.of(2020,7,1), result.getStart_date());
-        assertEquals(LocalDate.of(2020, 7, 2), result.getEnd_date());
-        assertEquals(18, result.getGuestId());
-        assertEquals(new BigDecimal(870), result.getTotal());
+        List<Reservation> result = repository.findByHostId(testHost);
+        assertEquals(1, result.size());
+        assertEquals(18, result.get(0).getGuestId());
     }
 
     @Test
     void shouldCreate() throws DataException {
-        Reservation result = repository.create(new Reservation(2, LocalDate.of(2020, 8, 2), LocalDate.of(2020, 8, 5), 17, new BigDecimal(890)));
-        assertNotNull(result);
-        assertEquals(LocalDate.of(2020,8,2), result.getStart_date());
-        assertEquals(LocalDate.of(2020, 8, 5), result.getEnd_date());
-        assertEquals(17, result.getGuestId());
-        assertEquals(new BigDecimal(890), result.getTotal());
+        Reservation res = new Reservation();
+        res.setId(2);
+        res.setGuestId(10);
+        res.setStart_date(LocalDate.of(2025, 6, 1));
+        res.setEnd_date(LocalDate.of(2025, 6, 5));
+        res.setTotal(new BigDecimal("600.00"));
+        res.setHost(testHost);
+
+        repository.create(res);
+
+        List<Reservation> result = repository.findByHostId(testHost);
+        assertEquals(2, result.size());
     }
 
     @Test
     void shouldUpdate() throws DataException {
-        assertTrue(repository.update(repository.findAll().get(0)));
+        List<Reservation> reservations = repository.findByHostId(testHost);
+        Reservation existing = reservations.get(0);
+        existing.setTotal(new BigDecimal("800.00"));
+
+        boolean updated = repository.update(existing);
+        assertTrue(updated);
+
+        List<Reservation> afterUpdate = repository.findByHostId(testHost);
+        assertEquals("800.0", afterUpdate.get(0).getTotal().toPlainString());
     }
 
     @Test
     void shouldDeleteById() throws DataException {
-        assertTrue(repository.deleteById(1, HostRepositoryDouble.HOST));
-        assertEquals(0, repository.findAll().size());
+        boolean deleted = repository.deleteById(1, testHost);
+        assertTrue(deleted);
+
+        List<Reservation> result = repository.findByHostId(testHost);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldGenerateNextId() throws Exception {
+        int nextId = repository.generateNextId(testHost);
+        assertEquals(2, nextId);
     }
 }

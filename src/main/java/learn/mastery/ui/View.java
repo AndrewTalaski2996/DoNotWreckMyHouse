@@ -2,6 +2,7 @@ package learn.mastery.ui;
 
 import learn.mastery.data.DataException;
 import learn.mastery.domain.HostService;
+import learn.mastery.domain.ReservationService;
 import learn.mastery.domain.Result;
 import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
 @Component
@@ -47,7 +47,7 @@ public class View {
         }
 
         String host_email = io.readRequiredString("Enter a Host's email: ");
-        Host host = service.findHostWithReservations(host_email);
+        Host host = service.findByEmail(host_email);
 
         if (host == null) {
             displayStatus(false, "No such Host found.");
@@ -147,16 +147,16 @@ public class View {
         return result;
     }
 
-    public void displayHostAndReservations(Host host) {
+    public void displayHostAndReservations(Host host, ReservationService service) throws DataException {
         if (host == null) {
             displayText("No such Host found.");
             return;
-        } else if (host.getReservations() == null || host.getReservations().isEmpty()) {
+        } else if (service.findByHostId(host) == null || service.findByHostId(host).isEmpty()) {
             displayText("No reservations found for host.");
             return;
         }
         displayHeader(host.getLast_name() + ": " + host.getCity() + ", " + host.getState());
-        for (Reservation res : host.getReservations()) {
+        for (Reservation res : service.findByHostId(host)) {
             displayText("ID: " + res.getId() + ", " + res.getStart_date() + " - " + res.getEnd_date() +
                     ", Guest: " + res.getGuest().getLast_name() + ", " + res.getGuest().getFirst_name() +
                     " Email: " + res.getGuest().getEmail());

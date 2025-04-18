@@ -70,7 +70,7 @@ public class ReservationRepositoryDouble implements ReservationRepository {
     }
 
     @Override
-    public int generateNextId() throws DataException {
+    public int generateNextId(Host host) throws DataException {
         return 2;
     }
 }

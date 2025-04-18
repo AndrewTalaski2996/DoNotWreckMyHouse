@@ -13,11 +13,9 @@ import java.util.List;
 public class HostService {
 
     private final HostRepository repository;
-    private final ReservationRepository reservationRepository;
 
-    public HostService(HostRepository repository, ReservationRepository reservationRepository) {
+    public HostService(HostRepository repository) {
         this.repository = repository;
-        this.reservationRepository = reservationRepository;
     }
 
     public List<Host> findAll() throws DataException {
@@ -26,14 +24,5 @@ public class HostService {
 
     public Host findByEmail(String email) throws DataException {
         return repository.findByEmail(email);
-    }
-
-    public Host findHostWithReservations(String email) throws DataException {
-        Host host = repository.findByEmail(email);
-        if (host != null) {
-            List<Reservation> reservations = reservationRepository.findByHostId(host);
-            host.setReservations(reservations);
-        }
-        return host;
     }
 }

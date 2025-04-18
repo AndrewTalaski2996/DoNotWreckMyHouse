@@ -1,8 +1,6 @@
 package learn.mastery.models;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class Host {
@@ -15,7 +13,6 @@ public class Host {
     private String city;
     private String state;
     private String zip_code;
-    private List<Reservation> reservations = new ArrayList<>();
     private BigDecimal standard_rate;
     private BigDecimal weekend_rate;
 
@@ -99,14 +96,6 @@ public class Host {
         this.zip_code = zip_code;
     }
 
-    public List<Reservation> getReservations() {
-        return reservations;
-    }
-
-    public void setReservations(List<Reservation> reservations) {
-        this.reservations = reservations;
-    }
-
     public BigDecimal getStandard_rate() {
         return standard_rate;
     }
@@ -127,11 +116,11 @@ public class Host {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Host host = (Host) o;
-        return Objects.equals(id, host.id) && Objects.equals(last_name, host.last_name) && Objects.equals(email, host.email) && Objects.equals(phone_number, host.phone_number) && Objects.equals(street_address, host.street_address) && Objects.equals(city, host.city) && Objects.equals(state, host.state) && Objects.equals(zip_code, host.zip_code) && Objects.equals(reservations, host.reservations) && Objects.equals(standard_rate, host.standard_rate) && Objects.equals(weekend_rate, host.weekend_rate);
+        return Objects.equals(id, host.id) && Objects.equals(last_name, host.last_name) && Objects.equals(email, host.email) && Objects.equals(phone_number, host.phone_number) && Objects.equals(street_address, host.street_address) && Objects.equals(city, host.city) && Objects.equals(state, host.state) && Objects.equals(zip_code, host.zip_code) && Objects.equals(standard_rate, host.standard_rate) && Objects.equals(weekend_rate, host.weekend_rate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, last_name, email, phone_number, street_address, city, state, zip_code, reservations, standard_rate, weekend_rate);
+        return Objects.hash(id, last_name, email, phone_number, street_address, city, state, zip_code, standard_rate, weekend_rate);
     }
 }

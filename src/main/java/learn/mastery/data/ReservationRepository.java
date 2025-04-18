@@ -19,5 +19,5 @@ public interface ReservationRepository {
 
     public boolean deleteById(int id, Host host) throws DataException;
 
-    public int generateNextId() throws DataException;
+    public int generateNextId(Host host) throws DataException;
 }

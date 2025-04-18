@@ -33,15 +33,25 @@ public class ReservationFileRepository implements ReservationRepository{
     @Override
     public List<Reservation> findAll() throws DataException {
         List<Reservation> result = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(directory))) {
-            reader.readLine(); //skip header
 
-            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                result.add(deserialize(line));
-            }
-        } catch (IOException ex) {
-            //don't throw on read
+        try {
+            Files.list(Paths.get(directory))
+                    .filter(p -> p.toString().endsWith(".csv"))
+                    .forEach(path -> {
+                        String filename = path.getFileName().toString();
+                        String hostId = filename.replace(".csv", "");
+                        Host host = new Host();
+                        host.setId(hostId);
+                        try {
+                            result.addAll(findByHostId(host));
+                        } catch (DataException e) {
+                            // log error
+                        }
+                    });
+        } catch (IOException e) {
+            throw new DataException(e);
         }
+
         return result;
     }
 
@@ -73,7 +83,7 @@ public class ReservationFileRepository implements ReservationRepository{
                 result.add(res);
             }
         } catch (IOException ex) {
-            //don't throw on read
+            throw new DataException(ex);
         }
 
         return result.stream()
@@ -88,8 +98,9 @@ public class ReservationFileRepository implements ReservationRepository{
             return null;
         }
 
-        List<Reservation> all = reservation.getHost().getReservations();
+        List<Reservation> all = findByHostId(reservation.getHost());
 
+        reservation.setId(generateNextId(reservation.getHost()));
         all.add(reservation);
         writeAll(all, reservation.getHost().getId());
 
@@ -98,7 +109,7 @@ public class ReservationFileRepository implements ReservationRepository{
 
     @Override
     public boolean update(Reservation reservation) throws DataException {
-        List<Reservation> all = reservation.getHost().getReservations();
+        List<Reservation> all = findByHostId(reservation.getHost());
         for (int i = 0; i < all.size(); i++) {
             if (all.get(i).getId() == reservation.getId()) {
                 all.set(i, reservation);
@@ -115,15 +126,15 @@ public class ReservationFileRepository implements ReservationRepository{
         for (int i = 0; i < all.size(); i++) {
             if (all.get(i).getId() == id) {
                 all.remove(i);
-                writeAll(all, all.get(0).getHost().getId());
+                writeAll(all, host.getId());
                 return true;
             }
         }
         return false;
     }
 
-    public int generateNextId() throws DataException {
-        List<Reservation> all = findAll();
+    public int generateNextId(Host host) throws DataException {
+        List<Reservation> all = findByHostId(host);
         if (all.isEmpty()) return 1;
         return all.get(all.size() - 1).getId() + 1;
     }
