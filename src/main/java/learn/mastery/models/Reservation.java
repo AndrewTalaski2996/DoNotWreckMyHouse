@@ -87,7 +87,7 @@ public class Reservation {
         BigDecimal total = new BigDecimal(BigInteger.ZERO);
         LocalDate start = start_date;
 
-        while(!start.isAfter(end_date)) {
+        while(start.isBefore(end_date)) {
             if (start.getDayOfWeek().equals(DayOfWeek.FRIDAY) || start.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
                 total = total.add(host.getWeekend_rate());
             } else {

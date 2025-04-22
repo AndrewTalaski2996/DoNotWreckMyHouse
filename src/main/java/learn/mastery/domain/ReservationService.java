@@ -56,7 +56,7 @@ public class ReservationService {
             return result;
         }
 
-        result.setReservation(reservationRepository.create(reservation));
+        reservationRepository.create(reservation);
 
         return result;
     }
@@ -67,7 +67,7 @@ public class ReservationService {
             return result;
         }
 
-        result.setReservation(reservationRepository.create(reservation));
+        reservationRepository.update(reservation);
 
         return result;
     }

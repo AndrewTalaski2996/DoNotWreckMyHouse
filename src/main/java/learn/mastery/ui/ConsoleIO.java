@@ -1,10 +1,12 @@
 package learn.mastery.ui;
 
+import learn.mastery.models.Reservation;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
 
 @Component
@@ -43,6 +45,22 @@ public class ConsoleIO {
                 if (result >= 0 && result <= 4) {
                     return result;
                 }
+            } catch (NumberFormatException ex) {
+                println("That is not a valid option.");
+            }
+        }
+    }
+
+    public Reservation readId(String prompt, List<Reservation> reservations) {
+        while (true) {
+            try {
+                int result = Integer.parseInt(readRequiredString(prompt));
+                for (Reservation r : reservations) {
+                    if (result == r.getId()) {
+                        return r;
+                    }
+                }
+                println("That is not a valid ID.");
             } catch (NumberFormatException ex) {
                 println("That is not a valid option.");
             }

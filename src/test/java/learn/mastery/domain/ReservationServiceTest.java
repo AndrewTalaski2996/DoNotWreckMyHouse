@@ -37,12 +37,8 @@ class ReservationServiceTest {
                 LocalDate.of(2026, 2, 5), 1, new BigDecimal("350"));
         actual.setHost(HOST);
         Result result = service.addReservation(actual);
-        assertNotNull(result.getReservation());
-        assertEquals(2, result.getReservation().getId());
-        assertEquals(LocalDate.of(2026, 2, 1), result.getReservation().getStart_date());
-        assertEquals(LocalDate.of(2026, 2, 5), result.getReservation().getEnd_date());
-        assertEquals(1, result.getReservation().getGuestId());
-        assertEquals(new BigDecimal(350), result.getReservation().getTotal());
+        assertTrue(result.isSuccess());
+        assertEquals(0, result.getErrorMessages().size());
     }
 
     @Test

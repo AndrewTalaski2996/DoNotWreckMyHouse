@@ -98,9 +98,9 @@ public class Controller {
             view.displayStatus(false, result.getErrorMessages());
         } else {
             view.displayHeader("Summary");
-            view.displayText("Start Date: " + result.getReservation().getStart_date());
-            view.displayText("End Date: " + result.getReservation().getEnd_date());
-            view.displayText(String.format("Total: $%.2f", result.getReservation().calculateTotal()));
+            view.displayText("Start Date: " + reservation.getStart_date());
+            view.displayText("End Date: " + reservation.getEnd_date());
+            view.displayText(String.format("Total: $%.2f", reservation.calculateTotal()));
 
             Result confirm = view.confirmUserChoice_View("Are you sure? [y/n]: ");
 
@@ -133,9 +133,9 @@ public class Controller {
             view.displayStatus(false, result.getErrorMessages());
         } else {
             view.displayHeader("Summary");
-            view.displayText("New Start Date: " + result.getReservation().getStart_date());
-            view.displayText("New End Date: " + result.getReservation().getEnd_date());
-            view.displayText(String.format("New Total: $%.2f", result.getReservation().calculateTotal()));
+            view.displayText("New Start Date: " + reservation.getStart_date());
+            view.displayText("New End Date: " + reservation.getEnd_date());
+            view.displayText(String.format("New Total: $%.2f", reservation.calculateTotal()));
 
             Result confirm = view.confirmUserChoice_View("Are you sure? [y/n]: ");
 

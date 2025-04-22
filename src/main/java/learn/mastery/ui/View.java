@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class View {
@@ -76,39 +77,45 @@ public class View {
     }
 
     public Reservation editReservation_View(Host host, Guest guest, List<Reservation> reservations) {
-        Reservation reservation = findReservation(host, guest, reservations);
+        List<Reservation> toEdit = findReservation(host, guest, reservations);
 
-        displayReservation(host, reservation);
-        displayText("Editing Reservation " + reservation.getId());
+        displayReservation(host, toEdit);
+
+        Reservation reserve = io.readId("Which reservation would you like to edit? (By ID): ", toEdit);
+
+        displayText("Editing Reservation " + reserve.getId());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
         String startDate = io.readRequiredString("Start Date: ");
         if (!startDate.isBlank()) {
-            reservation.setStart_date(LocalDate.parse(startDate, formatter));
+            reserve.setStart_date(LocalDate.parse(startDate, formatter));
         }
 
         String endDate = io.readRequiredString("End Date: ");
         if (!endDate.isBlank()) {
-            reservation.setEnd_date(LocalDate.parse(endDate, formatter));
+            reserve.setEnd_date(LocalDate.parse(endDate, formatter));
         }
 
-        return reservation;
+        return reserve;
     }
 
     public Reservation removeReservation_View(Host host, Guest guest, List<Reservation> reservations) {
-        Reservation reservation = findReservation(host, guest, reservations);
-        displayReservation(host, reservation);
-        displayText("Deleting Reservation " + reservation.getId());
+        List<Reservation> toRemove = findReservation(host, guest, reservations);
 
-        return reservation;
+        displayReservation(host, toRemove);
+
+        Reservation reserve = io.readId("Which reservation would you like to delete? (By ID): ", toRemove);
+
+        displayText("Deleting Reservation " + reserve.getId());
+
+        return reserve;
     }
 
-    private Reservation findReservation(Host host, Guest guest, List<Reservation> reservations) {
+    private List<Reservation> findReservation(Host host, Guest guest, List<Reservation> reservations) {
         return reservations.stream()
                 .filter(r -> r.getHost().getEmail().equals(host.getEmail()) && r.getGuest().getEmail().equals(guest.getEmail()))
-                .findFirst()
-                .orElse(null);
+                .collect(Collectors.toList());
     }
 
     public String getHostByEmail() {
@@ -163,14 +170,16 @@ public class View {
         }
     }
 
-    public void displayReservation(Host host, Reservation reservation) {
-        if (reservation == null) {
-            displayText("No reservation found.");
+    public void displayReservation(Host host, List<Reservation> reservations) {
+        if (reservations == null || reservations.isEmpty()) {
+            displayText("No reservations found.");
             return;
         }
         displayHeader(host.getLast_name() + ": " + host.getCity() + ", " + host.getState());
-        displayText("ID: " + reservation.getId() + ", " + reservation.getStart_date() + " - " + reservation.getEnd_date() +
-                ", Guest: " + reservation.getGuest().getLast_name() + ", " + reservation.getGuest().getFirst_name() +
-                " Email: " + reservation.getGuest().getEmail());
+        for (Reservation r : reservations) {
+            displayText("ID: " + r.getId() + ", " + r.getStart_date() + " - " + r.getEnd_date() +
+                    ", Guest: " + r.getGuest().getLast_name() + ", " + r.getGuest().getFirst_name() +
+                    " Email: " + r.getGuest().getEmail());
+        }
     }
 }

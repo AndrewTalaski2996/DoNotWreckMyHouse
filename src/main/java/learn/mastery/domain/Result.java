@@ -9,14 +9,6 @@ public class Result {
 
     private ArrayList<String> messages = new ArrayList<>();
 
-    private Reservation reservation;
-
-    public Reservation getReservation() { return reservation; }
-
-    public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
-    }
-
     public boolean isSuccess() { return messages.isEmpty(); }
 
     public List<String> getErrorMessages() { return new ArrayList<>(messages); }
